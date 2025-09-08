@@ -1,15 +1,16 @@
 from fastapi import FastAPI
-from service.api_routes import router
+from service.api_routes import router as service_router
 
+# FastAPI 앱 생성
 app = FastAPI(
-    title="My FastAPI Service",
+    title="My FastAPI Application",
     description="API with separated service layer",
     version="1.0.0"
 )
 
-# service 라우터를 /api 프리픽스로 포함
-app.include_router(router, prefix="/api", tags=["API Services"])
-
-@app.get("/")
-def main_root():
-    return {"message": "Main application running"}
+# 서비스 라우터를 /api 프리픽스로 포함
+app.include_router(
+    service_router, 
+    prefix="/api", 
+    tags=["Service API"]
+)
