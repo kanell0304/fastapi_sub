@@ -30,7 +30,7 @@ PUT /loans/{loan_id}/return (경로 매개변수)
 
 -2차 역할 분담-
 1. Users테이블 + API(CRUD) + JWT토큰인증(oAuth)
-2. 테이블 1개 + API(CRUD) + DATABASE setting
+2. 테이블 1개 + API(CRUD) + DATABASE Setting => DATABASE 생성 및 연결
 3. 테이블 1개 + API(CRUD) + API명세서 작성
 4. 테이블 2개 + API(CRUD)
 
