@@ -26,3 +26,12 @@ PUT /loans/{loan_id}/return (경로 매개변수)
 - 함현준 - DB 테이블 작성, Pydantic 모델링
 - 차영준 - DB 테이블 작성, Pydantic 모델링
 - 이경준 - API작성, api명세서
+
+
+-2차 역할 분담-
+1. Users테이블 + API(CRUD) + JWT토큰인증(oAuth)
+2. 테이블 1개 + API(CRUD) + DATABASE setting
+3. 테이블 1개 + API(CRUD) + API명세서 작성
+4. 테이블 2개 + API(CRUD)
+
+# CRUD = 생성(추가), 전체조회, 특정ID 조회 수정(특정 ID), 삭제(특정 ID)
