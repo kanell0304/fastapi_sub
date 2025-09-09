@@ -31,5 +31,5 @@ class UserLogin(BaseModel):
     username:str|None = None
     password:str|None = None
 
-
+#user_id / DB관리여부
 
