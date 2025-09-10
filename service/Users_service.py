@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 # from sqlalchemy.orm import Session
 from sqlalchemy import select
-from domain.Users import User, UserCreate, UserUpdate, UserLogin
+from domain.Users import User, UserCreate, UserUpdate, StaffLogin
 from pydantic import EmailStr
 from fastapi import HTTPException, status
 
@@ -77,5 +77,5 @@ class UserService:
 
 
     @staticmethod
-    async def login(db:AsyncSession,user:UserLogin):
+    async def login(db:AsyncSession,user:StaffLogin):
         pass
