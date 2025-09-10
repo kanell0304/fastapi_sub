@@ -32,8 +32,8 @@ class UserCrud:
 
     #get_email
     @staticmethod
-    async def get_email(db:AsyncSession, email:EmailStr):
-        result = await db.execute(select(User).where(User.email == email))
+    async def get_username(db:AsyncSession, username:str):
+        result = await db.execute(select(User).where(User.username == username))
         return result.scalar_one_or_none()
 
     #Update
