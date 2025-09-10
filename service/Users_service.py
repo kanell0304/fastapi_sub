@@ -46,6 +46,9 @@ class UserCrud:
 #Service
 class UserService:
     #signup 기본기능 -> is_staff -> 직원만 로그인
+    # 손님이면 phone[-4:] 비번 자동 생성
+    # 직원이면 password 필수 + 해시
+    # 로그인 시 is_staff 확인 → JWT 발급
     @staticmethod
     async def signup(db:AsyncSession,user:UserCreate):
         #중복 phone확인
