@@ -9,40 +9,45 @@ from typing import Optional, Annotated
 Base = declarative_base()
 
 #전화번호,이름, 4자리, 인증 암호화부분
-
+#SQLalchemy
 class User(Base):
     __tablename__="users"
     user_id = Column(Integer, primary_key=True)
-    username = Column(String(40), nullable=False)
-    phone = Column(String(20), nullable=False)
-    password = Column(String(100), nullable=False)
-    address = Column(String(300), nullable=False)
-    
-    admin = Column(Boolean, default=False)
-    admin_pw = Column(String(100), nullable=False)
+    name = Column(String(40), nullable=False)
+    phone = Column(String(20), unique=True,nullable=False)
+    password = Column(String(100))
+    address = Column(String(300), nullable=False)    
+    is_staff = Column(Boolean, default=False, nullable=False)
 
+#pydantic Create 
 class UserCreate(BaseModel):    
-    username:str = Field(...,min_length=2)    
-    phone:str = Field(...,min_length=4, max_length=20, description="'-'제외")
-    password:str = Annotated[Field(...,min_length=3, max_length=4),phone[-4:]] ###전화번호 맨뒤 4자리
+    name:str = Field(...,min_length=2)    
+    phone:str = Field(...,min_length=4, max_length=30)
+    password:str|None = Field(None,min_length=4, max_length=50) #손님-전화번호4자리/직원-비밀번호
     address:str = Field(...)
-    admin:bool | None = False   
+    is_staff:bool | None = False  
 
-
-
-
-
+#pydantic Update
 class UserUpdate(BaseModel):
-    username:Optional[str] = None
+    name:Optional[str] = None
     phone: Optional[str] = None
     password: Optional[str] = None
     address: Optional[str] = None
-    admin: Optional[bool] = False
+    is_staff: Optional[bool] = None
 
-#admin
-class AdminLogin(BaseModel):
-    username:str|None = None
-    admin_pw:str|None = None
-    address:str|None = None
-    admin: bool = False
+#login-직원만 전화번호/비밀번호
+class StaffLogin(BaseModel):    
+    phone:str|None = None
+    password:str|None = None    
 
+#pydantic Read 
+class UserRead(BaseModel):
+    user_id: int
+    name: str
+    phone: str
+    address: str
+    is_staff: bool
+
+    #ORM -> pydantic mapping (ORM 객체 속성을 읽어 Pydantic 필드로 매핑 가능하게 함)
+    class Config:
+        from_attributes = True
