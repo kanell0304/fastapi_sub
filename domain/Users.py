@@ -19,31 +19,21 @@ class User(Base):
     password = Column(String(100))
     address = Column(String(300), nullable=False)    
     is_staff = Column(Boolean, default=False, nullable=False)
-    name = Column(String(40), nullable=False)
-    phone = Column(String(20), unique=True,nullable=False)
-    password = Column(String(100))
-    address = Column(String(300), nullable=False)    
-    is_staff = Column(Boolean, default=False, nullable=False)
-
+    
 Base.metadata.create_all(bind=engine)
+
 
 #pydantic Create 
 class UserCreate(BaseModel):    
     name:str = Field(...,min_length=2)    
     phone:str = Field(...,min_length=4, max_length=30)
-    password:str|None = Field(None,min_length=4, max_length=50) #손님-전화번호4자리/직원-비밀번호
-    name:str = Field(...,min_length=2)    
-    phone:str = Field(...,min_length=4, max_length=30)
-    password:str|None = Field(None,min_length=4, max_length=50) #손님-전화번호4자리/직원-비밀번호
+    password:str|None = Field(None,min_length=4, max_length=50) #손님-전화번호4자리/직원-비밀번호    
     address:str = Field(...)
     is_staff:bool | None = False  
-    is_staff:bool | None = False  
-
+    
 
 #pydantic Update
 class UserUpdate(BaseModel):
-    name:Optional[str] = None
-    phone: Optional[str] = None
     name:Optional[str] = None
     phone: Optional[str] = None
     password: Optional[str] = None
@@ -56,11 +46,6 @@ class StaffLogin(BaseModel):
     password:str|None = None    
     is_staff: Optional[bool] = None
 
-#login-직원만 전화번호/비밀번호
-class StaffLogin(BaseModel):    
-    phone:str|None = None
-    password:str|None = None    
-
 #pydantic Read 
 class UserRead(BaseModel):
     user_id: int
@@ -72,3 +57,5 @@ class UserRead(BaseModel):
     #ORM -> pydantic mapping 
     class Config:
         from_attributes = True
+
+

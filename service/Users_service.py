@@ -1,47 +1,49 @@
 # from sqlalchemy.ext.asyncio import:
-# from database.db import SessionLocal, get_db
+from database.db import get_db
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from domain.Users import User, UserCreate, UserUpdate, StaffLogin
 
-from fastapi import HTTPException, status
+
+from fastapi import HTTPException, status, Depends
 
 #CRUD
 class UserCrud:
     #get user_id
     @staticmethod
-    async def get_id(db:Session, user_id:int):    
-        result = await db.execute(select(User).where(User.user_id == user_id))
-        return result.scalar_one_or_none
-    # async def get_id(db:Session, user_id:int):
-    #     user_id = await db.query(User).filter(User.user_id == user_id).first()
+    def get_id( user_id:int, db:Session):    
+        result =  db.execute(select(User).where(User.user_id == user_id))
+        return result.scalar_one_or_none()
+    # def get_id(db:Session, user_id:int):
+    #     user_id =  db.query(User).filter(User.user_id == user_id).first()
 
-    #get phone
+    #get phone O
     @staticmethod
-    async def get_phone(db:Session, phone:str):
-        result = await db.execute(select(User).where(User.phone == phone))
-        return result.scalar_one_or_none
+    def get_phone(phone:str,db:Session):
+        result =  db.execute(select(User).where(User.phone == phone))
+        return result.scalar_one_or_none()
 
-    #Create
+    #Create O
     @staticmethod
-    async def create_user(db:Session, user:UserCreate):
+    def create_user(user:UserCreate,db:Session):
         db_user = User(**user.model_dump())
         db.add(db_user)
-        await db.flush()
+        db.flush()
         return db_user
+    
     #Delete
     @staticmethod
-    async def delete_user(db:Session, user_id:int):
-        db_user =await db.get(User, user_id)
+    def delete_user(user_id:int,db:Session):
+        db_user = db.get(User, user_id)
         if db_user:
-            await db.delete(db_user)
-            await db.flush()
-            return db_user
+             db.delete(db_user)
+             db.flush()
+             return db_user
         return None     
 
     #Update (user_id)
     @staticmethod
-    async def update_user(db:Session, user_id:int, user:UserUpdate):
+    def update_user(user_id:int, user:UserUpdate,db:Session):
         pass
 
 #Service
@@ -51,12 +53,22 @@ class UserService:
     # 직원이면 password 필수 + 해시
     # 로그인 시 is_staff 확인 → JWT 발급
     @staticmethod
-    async def signup(db:Session,user:UserCreate):
-        #중복 phone확인
-        if await UserCrud.get_phone(db, user.phone):
+    def signup(user:UserCreate,db:Session):
+        # 중복 phone확인
+        if  UserCrud.get_phone(user.phone,db):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail="이미 가입한 번호입니다")
         
+        try:
+            db_user =  UserCrud.create_user(user,db)
+            db.commit()
+            db.refresh(db_user)
+            return db_user
+
+        except Exception:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail="전화번호 또는 비밀번호가 부적절합니다")
+
         #jwt 인증
         # hash_pw=
         # jwt작성후 password변경
@@ -64,19 +76,8 @@ class UserService:
         #                        phone=user.phone,
         #                        password=hash_pw,
         #                        address=user.address,
-        #                        is_staff=user.is_staff)
-        
-        try:
-            db_user = await UserCrud.create_user(db,user)
-            await db.commit()
-            await db.refresh(db_user)
-            return db_user
-
-        except Exception:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                detail="전화번호 또는 비밀번호가 부적절합니다")
-
+        #                        is_staff=user.is_staff)        
 
     @staticmethod
-    async def login(db:Session,user:StaffLogin):
+    def login(user:StaffLogin, db:Session):
         pass
