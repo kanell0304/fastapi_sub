@@ -48,6 +48,6 @@ class UserRead(BaseModel):
     address: str
     is_staff: bool
 
-    #ORM -> pydantic mapping (ORM 객체 속성을 읽어 Pydantic 필드로 매핑 가능하게 함)
+    #ORM -> pydantic mapping 
     class Config:
         from_attributes = True
