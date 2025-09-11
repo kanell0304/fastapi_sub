@@ -10,7 +10,7 @@ class HouseHolds(Base):
     __tablename__="households"
 
     h_id = Column(Integer, primary_key=True)
-    h_name = Column(String(50), nullable=False)
+    h_name = Column(String(50), unique=True, nullable=False)
     h_price = Column(Integer,nullable=False)    
     h_description = Column(String(300), nullable=False)
     h_quantity = Column(Integer, nullable=False)
