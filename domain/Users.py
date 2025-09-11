@@ -1,15 +1,11 @@
 from pydantic import BaseModel, Field, field_validator, ValidationError
 from pydantic import BaseModel, Field, field_validator, ValidationError
-# from database.database import Base
-from sqlalchemy.orm import declarative_base
+from database.db import Base, engine
 
 from sqlalchemy import Column, String, Integer, Boolean
 
 from sqlalchemy import Column, String, Integer, Boolean
 from typing import Optional, Annotated
-
-#db 연결후 삭제
-Base = declarative_base()
 
 #전화번호,이름, 4자리, 인증 암호화부분
 #SQLalchemy
@@ -29,7 +25,8 @@ class User(Base):
     address = Column(String(300), nullable=False)    
     is_staff = Column(Boolean, default=False, nullable=False)
 
-#pydantic Create 
+Base.metadata.create_all(bind=engine)
+
 #pydantic Create 
 class UserCreate(BaseModel):    
     name:str = Field(...,min_length=2)    
@@ -42,7 +39,7 @@ class UserCreate(BaseModel):
     is_staff:bool | None = False  
     is_staff:bool | None = False  
 
-#pydantic Update
+
 #pydantic Update
 class UserUpdate(BaseModel):
     name:Optional[str] = None

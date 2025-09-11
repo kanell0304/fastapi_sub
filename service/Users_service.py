@@ -1,15 +1,16 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-# from sqlalchemy.orm import Session
+# from sqlalchemy.ext.asyncio import:
+# from database.db import SessionLocal, get_db
+from sqlalchemy.orm import Session
 from sqlalchemy import select
 from domain.Users import User, UserCreate, UserUpdate, StaffLogin
-from pydantic import EmailStr
+
 from fastapi import HTTPException, status
 
 #CRUD
 class UserCrud:
     #get user_id
     @staticmethod
-    async def get_id(db:AsyncSession, user_id:int):    
+    async def get_id(db:Session, user_id:int):    
         result = await db.execute(select(User).where(User.user_id == user_id))
         return result.scalar_one_or_none
     # async def get_id(db:Session, user_id:int):
@@ -17,20 +18,20 @@ class UserCrud:
 
     #get phone
     @staticmethod
-    async def get_phone(db:AsyncSession, phone:str):
+    async def get_phone(db:Session, phone:str):
         result = await db.execute(select(User).where(User.phone == phone))
         return result.scalar_one_or_none
 
     #Create
     @staticmethod
-    async def create_user(db:AsyncSession, user:UserCreate):
+    async def create_user(db:Session, user:UserCreate):
         db_user = User(**user.model_dump())
         db.add(db_user)
         await db.flush()
         return db_user
     #Delete
     @staticmethod
-    async def delete_user(db:AsyncSession, user_id:int):
+    async def delete_user(db:Session, user_id:int):
         db_user =await db.get(User, user_id)
         if db_user:
             await db.delete(db_user)
@@ -40,7 +41,7 @@ class UserCrud:
 
     #Update (user_id)
     @staticmethod
-    async def update_user(db:AsyncSession, user_id:int, user:UserUpdate):
+    async def update_user(db:Session, user_id:int, user:UserUpdate):
         pass
 
 #Service
@@ -50,7 +51,7 @@ class UserService:
     # 직원이면 password 필수 + 해시
     # 로그인 시 is_staff 확인 → JWT 발급
     @staticmethod
-    async def signup(db:AsyncSession,user:UserCreate):
+    async def signup(db:Session,user:UserCreate):
         #중복 phone확인
         if await UserCrud.get_phone(db, user.phone):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
@@ -77,5 +78,5 @@ class UserService:
 
 
     @staticmethod
-    async def login(db:AsyncSession,user:StaffLogin):
+    async def login(db:Session,user:StaffLogin):
         pass
