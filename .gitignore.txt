@@ -1,0 +1,22 @@
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+
+# IDE files
+.idea/
+.vscode/
+
+# Dependencies (언어에 따라)
+node_modules/          # Node.js
+venv/                  # Python
+target/                # Java
+__pycache__/           # Python
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
