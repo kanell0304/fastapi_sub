@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from sqlalchemy import String
+from sqlalchemy import String, UniqueConstraint
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 from datetime import datetime, timezone
 from typing import Optional
@@ -10,6 +10,9 @@ Base = declarative_base()
 class Meat(Base):
 
     __tablename__="meats"
+    # (id와 상세정보를 제외한) 모든 값이 동일한 상품의 등록 막는 제약조건
+    __table_args__ = (UniqueConstraint('m_animal', 'm_part', 'm_country',
+                                       'm_weight', 'm_price', 'm_prep_date'))    
 
     m_id: Mapped[int] = mapped_column(primary_key=True)
     m_animal: Mapped[str] = mapped_column(String(20), nullable=False)
@@ -32,6 +35,10 @@ class MeatBase(BaseModel):
 
 #등록
 class CreateMeat(MeatBase):
+    pass
+
+#R
+class ReadMeat(MeatBase):
     pass
 
 #수정
