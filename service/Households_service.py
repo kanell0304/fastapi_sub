@@ -8,8 +8,8 @@ from domain.Households import HouseHolds, HouseHoldCreate, HouseHoldUpdate
 # @staticmethod
 async def is_validate_household_by_h_id(db: AsyncSession, h_id: str):
     result = await db.execute(select(HouseHolds).filter(HouseHolds.h_id == h_id))
-    if result is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="household Not Found")
+    if result:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="This household is already exists")
     return True
 
 
