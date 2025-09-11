@@ -3,7 +3,7 @@ from database.db import get_db
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from domain.Users import User, UserCreate, UserUpdate, StaffLogin
-
+from security.Jwt import hash_password
 
 from fastapi import HTTPException, status, Depends
 
@@ -23,10 +23,11 @@ class UserCrud:
 
     #Create 
     @staticmethod
-    def create_user(user:UserCreate,db:Session):
+    def create_user(user:UserCreate,db:Session)->User:
         db_user = User(**user.model_dump())
         db.add(db_user)
-        db.flush()
+        db.commit()     #commit/ flush 
+        db.refresh(db_user)    
         return db_user
     
     #Delete 
@@ -48,7 +49,7 @@ class UserCrud:
             for name, value in update_user.items():
                 setattr(db_user,name,value)
             db.commit()     #commit/ flush 
-            db.refresh(db_user)                
+            db.refresh(db_user)             
             return db_user
         return None        
 
@@ -62,26 +63,26 @@ class UserService:
     def signup(user:UserCreate,db:Session):
         # 중복 phone확인
         if  UserCrud.get_phone(user.phone,db):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                detail="이미 가입한 번호입니다")        
-        try:
-            db_user =  UserCrud.create_user(user,db)
-            db.commit()
-            db.refresh(db_user)
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,        
+                                detail="이미 가입한 번호입니다")   
+        #비밀번호 해싱     
+        hashed_pw= hash_password(user.password)
+        #유저객체
+        user_create = UserCreate(name=user.name,
+                                phone=user.phone,
+                                password=hashed_pw,
+                                address=user.address,
+                                is_staff=user.is_staff                        
+                                )
+        try:                
+            #DB저장
+            db_user = UserCrud.create_user(user_create,db)              
             return db_user
 
         except Exception:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail="전화번호 또는 비밀번호가 부적절합니다")
-
-        #jwt 인증
-        # hash_pw=
-        # jwt작성후 password변경
-        # user_create=UserCreate(name=user.name,
-        #                        phone=user.phone,
-        #                        password=hash_pw,
-        #                        address=user.address,
-        #                        is_staff=user.is_staff)        
+                 
 
     @staticmethod
     def login(user:StaffLogin, db:Session):
