@@ -9,21 +9,19 @@ from fastapi import HTTPException, status, Depends
 
 #CRUD
 class UserCrud:
-    #get user_id
+    #get user_id 
     @staticmethod
     def get_id( user_id:int, db:Session):    
         result =  db.execute(select(User).where(User.user_id == user_id))
-        return result.scalar_one_or_none()
-    # def get_id(db:Session, user_id:int):
-    #     user_id =  db.query(User).filter(User.user_id == user_id).first()
+        return result.scalar_one_or_none()   
 
-    #get phone O
+    #get phone 
     @staticmethod
     def get_phone(phone:str,db:Session):
         result =  db.execute(select(User).where(User.phone == phone))
         return result.scalar_one_or_none()
 
-    #Create O
+    #Create 
     @staticmethod
     def create_user(user:UserCreate,db:Session):
         db_user = User(**user.model_dump())
@@ -31,20 +29,28 @@ class UserCrud:
         db.flush()
         return db_user
     
-    #Delete
+    #Delete 
     @staticmethod
-    def delete_user(user_id:int,db:Session):
+    def delete_user_by_id(user_id:int,db:Session):
         db_user = db.get(User, user_id)
         if db_user:
              db.delete(db_user)
-             db.flush()
+             db.commit()
              return db_user
         return None     
 
     #Update (user_id)
     @staticmethod
-    def update_user(user_id:int, user:UserUpdate,db:Session):
-        pass
+    def update_user_by_id(user_id:int, user:UserUpdate,db:Session):
+        db_user = db.get(User, user_id)
+        if db_user:
+            update_user = user.model_dump(exclude_unset=True)
+            for name, value in update_user.items():
+                setattr(db_user,name,value)
+            db.commit()     #commit/ flush 
+            db.refresh(db_user)                
+            return db_user
+        return None        
 
 #Service
 class UserService:
@@ -57,8 +63,7 @@ class UserService:
         # 중복 phone확인
         if  UserCrud.get_phone(user.phone,db):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                detail="이미 가입한 번호입니다")
-        
+                                detail="이미 가입한 번호입니다")        
         try:
             db_user =  UserCrud.create_user(user,db)
             db.commit()
