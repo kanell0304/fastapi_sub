@@ -9,6 +9,6 @@ router = APIRouter(prefix="/snacks", tags=["Snacks"])
 
 #상품 등록
 @router.post("/create", response_model= ReadSnack)
-def create_snack(snack:CreateSnack,db:Session=Depends(get_db)):
-    db_snack = SnackService.create_snack(snack,db)
+async def create_snack(snack:CreateSnack,db:Session=Depends(get_db)):
+    db_snack = await SnackService.create_snack(snack,db)
     return db_snack
