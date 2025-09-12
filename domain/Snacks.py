@@ -1,10 +1,9 @@
 from pydantic import BaseModel, Field
 from sqlalchemy import String
-from sqlalchemy.orm import declarative_base, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 from datetime import date
 from typing import Optional
-
-Base = declarative_base()
+from database.db import engine, Base
 
 #ORM
 class Snack(Base):
@@ -18,6 +17,9 @@ class Snack(Base):
     s_exp_date: Mapped[date] = mapped_column(nullable=False)
     s_description: Mapped[str | None] = mapped_column(String(300), nullable=True)
 
+Base.metadata.create_all(bind=engine)
+
+
 #pydantic모델 공통 필드
 class SnackBase(BaseModel):
     s_name: str=Field(..., max_length=50, title="상품 이름")
@@ -29,6 +31,10 @@ class SnackBase(BaseModel):
 #등록
 class CreateSnack(SnackBase):
     pass
+
+#R
+class ReadSnack(SnackBase):
+    s_id: int
 
 #수정
 class UpdateSnack(BaseModel):

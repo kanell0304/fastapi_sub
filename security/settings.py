@@ -4,7 +4,7 @@ from datetime import timedelta
 
 class Settings(BaseSettings):
     SECRET_KEY: str = Field(..., alias="SECRET_KEY")
-    ALGORITHM: str = Field("H256", alias="ALGORITHM")
+    ALGORITHM: str = Field("HS256", alias="ALGORITHM")
     ACCESS_TOKEN_EXPIRE:int = Field(900, alias="ACCESS_TOKEN_EXPIRE")
     REFRESH_TOKEN_EXPIRE:int =Field (604800, alias="REFRESH_TOKEN_EXPIRE")
 
