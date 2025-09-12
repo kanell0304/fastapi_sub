@@ -27,6 +27,7 @@ def create_jwt(uid:int, expire:timedelta, **kwargs) -> str:
     )
     return encoded_token
 
+# 
 def validate_jwt(token:str)->int:
     payload=jwt.decode(token, settings.SECRET_KEY,algorithms=[settings.ALGORITHM])
     return payload.get("sub")

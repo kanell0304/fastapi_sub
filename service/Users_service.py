@@ -95,10 +95,12 @@ class UserService:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail="전화번호 또는 비밀번호가 부적절합니다")
                  
-    # login  (username -> phone 사용) / 직원만(is_staff=True)로그인가능
+    # login  (username: phone, password:password 사용) / 
+    # 직원만(is_staff=True)로그인가능
     @staticmethod
     async def login(user:StaffLogin, db:AsyncSession):
         db_user = await UserCrud.get_phone(user.phone,db)
+        
         if not db_user or not await verify_password(user.password, db_user.password):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
                                 detail="잘못된 사용자 혹은 비밀번호입니다")

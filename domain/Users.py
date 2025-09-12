@@ -44,16 +44,14 @@ class UserUpdate(BaseModel):
 class StaffLogin(BaseModel):    
     phone:str|None = None
     password:str|None = None    
-    is_staff: Optional[bool] = None
+    
 
 
 #pydantic Read 
 class UserRead(BaseModel):
     user_id: int
     name: str
-    phone: str
-    address: str
-    is_staff: bool
+    
 
     #ORM -> pydantic mapping 
     class Config:
@@ -65,3 +63,12 @@ class AuthResponse(BaseModel):
         access_token: str
         refresh_token: str
 
+class PrivateUserRead(BaseModel):
+    user_id: int
+    name: str
+    phone: str
+    address: str
+    is_staff: bool
+
+    class Config:
+        from_attributes = True
