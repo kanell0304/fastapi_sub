@@ -72,7 +72,7 @@ class MeatService:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="존재하지 않는 id입니다."
 )
         try:
-            db.delete(db_meat)
+            await db.delete(db_meat)
             await db.commit()
             return None
         

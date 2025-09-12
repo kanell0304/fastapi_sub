@@ -21,7 +21,7 @@ async def is_validate_household_by_h_name(db: AsyncSession, h_name: str):
     return True
 
 
-class Households_service:
+class HouseholdsService:
 
     @staticmethod
     async def get_h_id(db: AsyncSession, h_id: int):
