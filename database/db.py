@@ -27,3 +27,5 @@ def get_db() -> Generator:
         yield db
     finally:
         db.close()
+#DB연결 안될시 경로 확인
+print("DB URL:", DATABASE_URL)
