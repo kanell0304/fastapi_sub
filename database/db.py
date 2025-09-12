@@ -1,6 +1,7 @@
 # database/db.py
 from __future__ import annotations
-
+from dotenv import load_dotenv
+load_dotenv()  
 import os, asyncio
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
