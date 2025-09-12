@@ -1,31 +1,43 @@
+# database/db.py
 from __future__ import annotations
 
-import os
-from typing import Generator
+import os, asyncio
+from typing import AsyncGenerator
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.orm import declarative_base
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-from dotenv import load_dotenv
-load_dotenv(dotenv_path=".env")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./app.db")
 
-# ✅ DATABASE_URL 우선순위: 환경변수 > .env (uvicorn --env-file .env 로 로드 가능)
-# 예) MySQL:  mysql+pymysql://user:password@localhost:3306/fastapi_db?charset=utf8mb4
-# 예) SQLite: sqlite:///./app.db
-# DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./app.db")
-DATABASE_URL = os.getenv("DATABASE_URL")
+engine = create_async_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    future=True,
+)
 
-# Engine & Session
-engine = create_engine(DATABASE_URL, pool_pre_ping=True, future=True)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, future=True)
+SessionLocal = async_sessionmaker(
+    bind=engine,
+    expire_on_commit=False,
+    class_=AsyncSession,
+)
 
-# SQLAlchemy Base
 Base = declarative_base()
 
-def get_db() -> Generator:
-    db = SessionLocal()
-    try:
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with SessionLocal() as db:
         yield db
-    finally:
-        db.close()
-#DB연결 안될시 경로 확인
-print("DB URL:", DATABASE_URL)
+
+# ✅ 최초 기동 시 테이블 생성 (학습/과제용)
+async def init_models():
+    from domain.Beverages import Beverage  # noqa: F401
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+# 모듈 import 시 1회 실행 (uvicorn --reload 환경에서도 안전)
+try:
+    loop = asyncio.get_event_loop()
+    if loop.is_running():
+        asyncio.create_task(init_models())
+    else:
+        loop.run_until_complete(init_models())
+except RuntimeError:
+    asyncio.run(init_models())
