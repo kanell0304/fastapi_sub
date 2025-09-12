@@ -6,10 +6,10 @@ import jwt
 
 pwd_context = CryptContext(schemes=["bcrypt"])
 
-def hash_password(password: str)->str:
+async def hash_password(password: str)->str:
     return pwd_context.hash(password)
 
-def verify_password(plain_password, hashed_password) -> bool:
+async def verify_password(plain_password, hashed_password) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 def create_access_token(uid:int) -> str:

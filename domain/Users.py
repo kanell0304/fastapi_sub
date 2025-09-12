@@ -20,7 +20,7 @@ class User(Base):
     address = Column(String(300), nullable=False)    
     is_staff = Column(Boolean, default=False, nullable=False)
     
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 
 #pydantic Create 
