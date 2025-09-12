@@ -27,7 +27,7 @@ Base.metadata.create_all(bind=engine)
 class UserCreate(BaseModel):    
     name:str = Field(...,min_length=2)    
     phone:str = Field(...,min_length=4, max_length=30)
-    password:str|None = Field(None,min_length=4) #손님-전화번호4자리/직원-비밀번호    
+    password:str|None = Field(None,min_length=4)
     address:str = Field(...)
     is_staff:bool | None = False  
     

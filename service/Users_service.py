@@ -3,7 +3,7 @@ from database.db import get_db
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from domain.Users import User, UserCreate, UserUpdate, StaffLogin
-from security.Jwt import hash_password
+from security.Jwt import hash_password, verify_password, create_access_token, create_refresh_token
 
 from fastapi import HTTPException, status, Depends
 
@@ -83,7 +83,15 @@ class UserService:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail="전화번호 또는 비밀번호가 부적절합니다")
                  
-
+    # phone =(email), password= password
     @staticmethod
     def login(user:StaffLogin, db:Session):
-        pass
+        db_user = UserCrud.get_phone(user.phone,db)
+        if not db_user or not verify_password(user.password, db_user.password):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
+                                detail="잘못된 사용자 혹은 비밀번호입니다")
+        
+        access_token = create_access_token(db_user.user_id)   
+        refresh_token = create_refresh_token(db_user.user_id)
+
+        
