@@ -8,24 +8,24 @@ class MeatService:
 
     # 생성
     @staticmethod
-    def create_meat(db:AsyncSession, create_meat:CreateMeat):
+    async def create_meat(db:AsyncSession, create_meat:CreateMeat):
         db_meat=Meat(**create_meat.model_dump())
         db.add(db_meat)
 
         try:
-            db.commit()
-            db.refresh(db_meat)
+            await db.commit()
+            await db.refresh(db_meat)
             return db_meat            
 
         # id, 설명 제외한 모든 컬럼 값 동일할 경우
         except IntegrityError as e:   
-            db.rollback()
+            await db.rollback()
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"동일한 상품이 존재합니다. {e}")
 
     # id로 조회
     @staticmethod
-    def get_meat_id(db: AsyncSession, id:int):
-        db_meat = db.get(Meat, id)  
+    async def get_meat_id(db: AsyncSession, id:int):
+        db_meat = await db.get(Meat, id)  
 
         if not db_meat:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="존재하지 않는 id입니다")
@@ -33,8 +33,8 @@ class MeatService:
 
     # 전체 데이터 조회
     @staticmethod
-    def get_all_meats(db: AsyncSession):
-        result = db.execute(select(Meat))
+    async def get_all_meats(db: AsyncSession):
+        result = await db.execute(select(Meat))
         db_all_meats = result.scalars().all()  
 
         if not db_all_meats:
@@ -43,8 +43,8 @@ class MeatService:
 
     # 데이터 수정
     @staticmethod
-    def update_meat(db:AsyncSession, id:int, update_meat:UpdateMeat):
-        db_meat=db.get(Meat, id)
+    async def update_meat(db:AsyncSession, id:int, update_meat:UpdateMeat):
+        db_meat=await db.get(Meat, id)
         if not db_meat:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="존재하지 않는 id입니다")
        
@@ -52,13 +52,13 @@ class MeatService:
             update_data=update_meat.model_dump(exclude_unset=True)
             for column, value in update_data.items():
                 setattr(db_meat, column, value)
-            db.commit()
-            db.refresh(db_meat)
+            await db.commit()
+            await db.refresh(db_meat)
             return db_meat
        
         # 수정값과 중복되는 데이터 있을 경우
         except IntegrityError as e:
-            db.rollback()
+            await db.rollback()
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"동일한 상품이 존재합니다. {e}")
             
         except Exception as e:
@@ -66,14 +66,14 @@ class MeatService:
 
     # 데이터 삭제
     @staticmethod
-    def delete_meat(db: AsyncSession, id:int):
-        db_meat = db.get(Meat, id)  
+    async def delete_meat(db: AsyncSession, id:int):
+        db_meat = await db.get(Meat, id)  
         if not db_meat:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="존재하지 않는 id입니다")
        
         try:
             db.delete(db_meat)
-            db.commit()
+            await db.commit()
             return db_meat
        
         except Exception as e:
