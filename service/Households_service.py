@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from sqlalchemy import select
-from domain.Households import HouseHolds, HouseHoldCreate, HouseHoldUpdate
+from domain.Households import HouseHolds, HouseHoldCreate, HouseHoldUpdate, HouseHoldResponse
 
 
 # @staticmethod
@@ -72,7 +72,7 @@ class Households_service:
         await db.commit()
         await db.refresh(new_household)
 
-        return {"msg": "Add New Household", "Household": {"h_id": new_household.h_id, "h_name": new_household.h_name, "h_price": new_household.h_price, "h_description": new_household.h_description, "h_quantity": new_household.h_quantity}}
+        return {"msg": "Add New Household", "Household": HouseHoldResponse(**new_household)}
 
 
     @staticmethod
