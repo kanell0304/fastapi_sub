@@ -57,10 +57,13 @@ class UserCrud:
     #jwt 인증관련
     #refresh_token
     @staticmethod
-    async def update_refresh_token(user_id:int,refresh_token:str, db:AsyncSession):
+    async def update_refresh_token(
+        user_id:int,refresh_token:str, db:AsyncSession) ->User:
         db_user = await db.get(User, user_id)        
         if db_user:
-            db_user.refresh_token
+            db_user.refresh_token = refresh_token
+            await db.flush()
+        return db_user
 
 #Service
 class UserService:
@@ -69,7 +72,7 @@ class UserService:
     # 직원이면 password 필수 + 해시
     # 로그인 시 is_staff 확인 → JWT 발급
     @staticmethod
-    async def signup(user:UserCreate,db:AsyncSession):
+    async def signup(user:UserCreate,db:AsyncSession) ->User:
         # 중복 phone확인
         if await UserCrud.get_phone(user.phone,db):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,        
@@ -92,15 +95,26 @@ class UserService:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail="전화번호 또는 비밀번호가 부적절합니다")
                  
-    # # phone =(email), password= password
-    # @staticmethod
-    # async def login(user:StaffLogin, db:AsyncSession):
-    #     db_user = UserCrud.get_phone(user.phone,db)
-    #     if not db_user or not verify_password(user.password, db_user.password):
-    #         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
-    #                             detail="잘못된 사용자 혹은 비밀번호입니다")
+    # login  (username -> phone 사용) / 직원만(is_staff=True)로그인가능
+    @staticmethod
+    async def login(user:StaffLogin, db:AsyncSession):
+        db_user = await UserCrud.get_phone(user.phone,db)
+        if not db_user or not await verify_password(user.password, db_user.password):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
+                                detail="잘못된 사용자 혹은 비밀번호입니다")
+        #직원여부 확인
+        if not db_user.is_staff:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail="직원 계정이 아닙니다")
         
-    #     access_token = create_access_token(db_user.user_id)   
-    #     refresh_token = create_refresh_token(db_user.user_id)
+        #jwt인증 토큰 (헤더/JSON)
+        access_token = create_access_token(db_user.user_id)   
+        refresh_token = create_refresh_token(db_user.user_id)
+
+        verified_staff= await UserCrud.update_refresh_token(db_user.user_id,
+                                                            refresh_token,db)
+        await db.commit()
+        await db.refresh(verified_staff)
+        return verified_staff, access_token, refresh_token
 
         

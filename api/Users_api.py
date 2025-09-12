@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from fastapi import HTTPException, status
 
 from sqlalchemy import select
@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.db import get_db
-from domain.Users import User, UserCreate, UserUpdate,StaffLogin,UserRead
+from domain.Users import User, UserCreate, UserUpdate,StaffLogin,UserRead,AuthResponse
 from service.Users_service import UserService, UserCrud
 
 router = APIRouter()
@@ -35,3 +35,13 @@ async def delete_user(user_id:int,db:AsyncSession=Depends(get_db)):
 async def update_user_by_id(user_id:int, user:UserUpdate,db:AsyncSession=Depends(get_db)):
     result = await UserCrud.update_user_by_id(user_id,user,db)    
     return result
+
+@router.post("/login", response_model=AuthResponse)
+async def login(staff:StaffLogin, db:AsyncSession=Depends(get_db)):
+    result = await UserService.login(staff,db)
+    verified_staff, access_token, refresh_token = result
+    return {
+        "verified_staff":verified_staff,
+        "access_token":access_token,
+        "refresh_token":refresh_token
+    }

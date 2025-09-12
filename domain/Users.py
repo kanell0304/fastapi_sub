@@ -46,6 +46,7 @@ class StaffLogin(BaseModel):
     password:str|None = None    
     is_staff: Optional[bool] = None
 
+
 #pydantic Read 
 class UserRead(BaseModel):
     user_id: int
@@ -58,4 +59,9 @@ class UserRead(BaseModel):
     class Config:
         from_attributes = True
 
+#AuthResponse
+class AuthResponse(BaseModel):
+        verified_staff:UserRead
+        access_token: str
+        refresh_token: str
 
