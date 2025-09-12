@@ -61,14 +61,15 @@ class SnackService:
     # 데이터 삭제
     @staticmethod
     async def delete_snack(db: AsyncSession, id:int):
-        db_snack = await db.get(Snack, id)  
+        db_snack = await db.get(Snack, id) 
         if not db_snack:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="존재하지 않는 id입니다")
-       
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="존재하지 않는 id입니다."
+)
         try:
             db.delete(db_snack)
             await db.commit()
-            return db_snack
-       
+            return None
+        
         except Exception as e:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e}")  
+            await db.rollback()
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e}")
