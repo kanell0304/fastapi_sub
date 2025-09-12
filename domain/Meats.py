@@ -1,10 +1,9 @@
 from pydantic import BaseModel, Field
 from sqlalchemy import String, UniqueConstraint
-from sqlalchemy.orm import declarative_base, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime, timezone
 from typing import Optional
-
-Base = declarative_base()
+from database.db import engine, Base
 
 #ORM
 class Meat(Base):
@@ -22,6 +21,10 @@ class Meat(Base):
     m_price: Mapped[int] = mapped_column(nullable=False)    
     m_prep_date: Mapped[datetime] = mapped_column(nullable=False)
     m_description: Mapped[str | None] = mapped_column(String(300), nullable=True)
+
+Base.metadata.create_all(bind=engine)
+
+
 
 #pydantic모델 공통 필드
 class MeatBase(BaseModel):
