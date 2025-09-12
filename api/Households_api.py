@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.db import get_db
@@ -11,7 +13,7 @@ async def create_household(household: HouseHoldCreate, db: AsyncSession=Depends(
     result = await Households_service.create(db, household)
     return result
 
-@router.get("/get_households", response_model=HouseHoldResponse)
+@router.get("/get_households", response_model=List[HouseHoldResponse])
 async def get_all_households(db: AsyncSession=Depends(get_db)):
     result = await Households_service.get_all_household(db)
     return result
@@ -29,4 +31,7 @@ async def update_household_by_h_id(h_id: int, household: HouseHoldUpdate, db: As
 @router.delete("/delete/{h_id}")
 async def delete_household_by_h_id(h_id: int, db: AsyncSession=Depends(get_db)):
     result = await Households_service.delete_household_by_h_id(db, h_id)
-    return {"msg": "Delete Success", "deleted household": HouseHoldResponse(**result)}
+    if result:
+        return {"msg": "Delete Success"}
+    else:
+        return {"msg": "Delete Failed"}
