@@ -66,7 +66,7 @@ class SnackService:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="존재하지 않는 id입니다."
 )
         try:
-            db.delete(db_snack)
+            await db.delete(db_snack)
             await db.commit()
             return None
         
