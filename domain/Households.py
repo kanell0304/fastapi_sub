@@ -1,9 +1,8 @@
 from pydantic import BaseModel, Field
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import declarative_base
 from typing import Optional
+from database.db import engine, Base
 
-Base = declarative_base()
 
 class HouseHolds(Base):
 
@@ -14,6 +13,8 @@ class HouseHolds(Base):
     h_price = Column(Integer,nullable=False)
     h_description = Column(String(300), nullable=False)
     h_quantity = Column(Integer, nullable=False)
+
+Base.metadata.create_all(bind=engine)
 
 class HouseHoldCreate(BaseModel):    
     h_name: str = Field(..., min_length=1)    

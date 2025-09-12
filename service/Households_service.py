@@ -36,7 +36,7 @@ class Households_service:
         result = await db.execute(select(HouseHolds))
         if len(result) == 0:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="household Not Found")
-        return result
+        return result.scalars().all()
 
 
     @staticmethod
@@ -44,7 +44,7 @@ class Households_service:
         result = await db.execute(select(HouseHolds).filter(HouseHolds.h_id == h_id))
         if result is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="household Not Found")
-        return result
+        return result.scalar_one_or_none()
 
 
     # @staticmethod
@@ -71,8 +71,7 @@ class Households_service:
         db.add(new_household)
         await db.commit()
         await db.refresh(new_household)
-
-        return {"msg": "Add New Household", "Household": HouseHoldResponse(**new_household)}
+        return {"msg": "Add New Household", "Household": HouseHoldResponse(**new_household.scalar_one_or_none())}
 
 
     @staticmethod
@@ -83,7 +82,7 @@ class Households_service:
             for i, j in update_household.items():
                 setattr(household, i, j)
             await db.flush()
-            return household
+            return household.scalar_one_or_none()
         return None
 
 
@@ -93,4 +92,4 @@ class Households_service:
         if household:
             await db.delete(household)
             await db.flush()
-        return household
+        return household.scalar_one_or_none()
