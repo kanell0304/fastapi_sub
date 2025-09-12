@@ -32,6 +32,10 @@ class SnackBase(BaseModel):
 class CreateSnack(SnackBase):
     pass
 
+#R
+class ReadSnack(SnackBase):
+    s_id: int
+
 #수정
 class UpdateSnack(BaseModel):
     s_name: Optional[str]=Field(None, max_length=50, title="상품 이름")
