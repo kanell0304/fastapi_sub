@@ -51,7 +51,15 @@ class UserCrud:
             db.commit()     #commit/ flush 
             db.refresh(db_user)             
             return db_user
-        return None        
+        return None
+
+    #jwt 인증관련
+    #refresh_token
+    @staticmethod
+    async def update_refresh_token(user_id:int,refresh_token:str, db:Session):
+        db_user = db.get(User, user_id)        
+        if db_user:
+            db_user.refresh_token
 
 #Service
 class UserService:
