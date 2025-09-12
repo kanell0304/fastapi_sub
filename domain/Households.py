@@ -14,7 +14,7 @@ class HouseHolds(Base):
     h_description = Column(String(300), nullable=False)
     h_quantity = Column(Integer, nullable=False)
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine) 09.12 19:48 주석처리
 
 class HouseHoldCreate(BaseModel):    
     h_name: str = Field(..., min_length=1)    

@@ -23,7 +23,7 @@ class Meat(Base):
     m_prep_date: Mapped[datetime] = mapped_column(nullable=False)
     m_description: Mapped[str | None] = mapped_column(String(300), nullable=True)
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine) 09.12 19:48 주석처리
 
 
 

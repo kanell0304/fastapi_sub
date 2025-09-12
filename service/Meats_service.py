@@ -67,11 +67,10 @@ class MeatService:
     # 데이터 삭제
     @staticmethod
     async def delete_meat(db: AsyncSession, id:int):
-        db_meat = await db.get(Meat, id)  
-        if not db_meat:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="존재하지 않는 id입니다")
-       
         try:
+            db_meat = await db.get(Meat, id)  
+            if not db_meat:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="존재하지 않는 id입니다")
             db.delete(db_meat)
             await db.commit()
             return db_meat

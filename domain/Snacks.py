@@ -17,7 +17,7 @@ class Snack(Base):
     s_exp_date: Mapped[date] = mapped_column(nullable=False)
     s_description: Mapped[str | None] = mapped_column(String(300), nullable=True)
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine) 09.12 19:48 주석처리
 
 
 #pydantic모델 공통 필드

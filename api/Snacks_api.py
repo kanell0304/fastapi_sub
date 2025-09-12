@@ -28,6 +28,6 @@ async def get_snack_id(snack:UpdateSnack, db:AsyncSession=Depends(get_db), id:in
     return db_snack
 
 @router.delete("/delete")
-async def get_snack_id(db:AsyncSession=Depends(get_db), id:int=Query(ge=1)):
-    db_snack = await SnackService.delete_snack(db,id)
-    return db_snack
+async def delete_meat(db:AsyncSession=Depends(get_db), id:int=Query(ge=1)):
+    await SnackService.delete_meat(db,id)
+    return {"msg":f"{id}번 삭제 완료"}
