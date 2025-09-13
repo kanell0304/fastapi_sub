@@ -4,9 +4,9 @@ from database.db import Base, engine
 
 from sqlalchemy import Column, String, Integer, Boolean
 
-from sqlalchemy import Column, String, Integer, Boolean
+from sqlalchemy import Column, String, Integer, Boolean,DateTime
 from typing import Optional, Annotated
-
+from datetime import datetime
 #전화번호,이름, 4자리, 인증 암호화부분
 #SQLalchemy
 #전화번호,이름, 4자리, 인증 암호화부분
@@ -19,6 +19,7 @@ class User(Base):
     password = Column(String(300))
     address = Column(String(300), nullable=False)    
     is_staff = Column(Boolean, default=False, nullable=False)
+    refresh_token = Column(String(300), nullable=True)
     
 # Base.metadata.create_all(bind=engine)
 
@@ -58,10 +59,6 @@ class UserRead(BaseModel):
         from_attributes = True
 
 #AuthResponse
-class AuthResponse(BaseModel):
-        verified_staff:UserRead
-        access_token: str
-        refresh_token: str
 
 class PrivateUserRead(BaseModel):
     user_id: int
@@ -72,3 +69,8 @@ class PrivateUserRead(BaseModel):
 
     class Config:
         from_attributes = True
+
+class AuthResponse(BaseModel):
+        verified_staff:PrivateUserRead
+        access_token: str
+        refresh_token: str

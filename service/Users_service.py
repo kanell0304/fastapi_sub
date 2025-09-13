@@ -16,7 +16,7 @@ class UserCrud:
         result = await db.execute(select(User).where(User.user_id == user_id))
         return result.scalar_one_or_none()   
 
-    #get phone 
+    #get phone(username대신 사용) 
     @staticmethod
     async def get_phone(phone:str,db:AsyncSession):
         result = await db.execute(select(User).where(User.phone == phone))
@@ -43,11 +43,14 @@ class UserCrud:
 
     #Update (user_id)
     @staticmethod
-    async def update_user_by_id(user_id:int, user:UserUpdate,db:AsyncSession):
+    async def update_user_by_id(user:UserUpdate, user_id:int, db:AsyncSession):
         db_user = await db.get(User, user_id)
         if db_user:
             update_user = user.model_dump(exclude_unset=True)
             for name, value in update_user.items():
+                #업데이트시 비밀번호 노출방지
+                if name =="password":
+                    value = await hash_password(value)
                 setattr(db_user,name,value)
             await db.commit()     #commit/ flush 
             await db.refresh(db_user)             
@@ -67,10 +70,17 @@ class UserCrud:
 
 #Service
 class UserService:
-    #signup 기본기능 -> is_staff -> 직원만 로그인
-    # 손님이면 phone[-4:] 비번 자동 생성
-    # 직원이면 password 필수 + 해시
+    #signup 기본기능 -> is_staff -> 직원만 로그인        
     # 로그인 시 is_staff 확인 → JWT 발급
+    #DB에서 id의 사용자 조회
+    @staticmethod
+    async def get_user(user_id:int, db:AsyncSession) -> User:
+        db_user = await UserCrud.get_id(user_id,db)
+        if not db_user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="사용자 없음")
+        return db_user
+
     @staticmethod
     async def signup(user:UserCreate,db:AsyncSession) ->User:
         # 중복 phone확인
@@ -98,7 +108,7 @@ class UserService:
     # login  (username: phone, password:password 사용) / 
     # 직원만(is_staff=True)로그인가능
     @staticmethod
-    async def login(user:StaffLogin, db:AsyncSession):
+    async def login(user:StaffLogin, db:AsyncSession)-> tuple[User,str,str]:
         db_user = await UserCrud.get_phone(user.phone,db)
         
         if not db_user or not await verify_password(user.password, db_user.password):
@@ -107,9 +117,9 @@ class UserService:
         #직원여부 확인
         if not db_user.is_staff:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                                detail="직원 계정이 아닙니다")
+                                detail="직원만 로그인 가능합니다")
         
-        #jwt인증 토큰 (헤더/JSON)
+        #jwt token 
         access_token = create_access_token(db_user.user_id)   
         refresh_token = create_refresh_token(db_user.user_id)
 

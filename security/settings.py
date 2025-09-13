@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE:int = Field(900, alias="ACCESS_TOKEN_EXPIRE")
     REFRESH_TOKEN_EXPIRE:int =Field (604800, alias="REFRESH_TOKEN_EXPIRE")
 
+    
+
     class Config:
         case_sensitive = True
         extra = "allow"
