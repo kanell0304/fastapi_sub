@@ -21,7 +21,7 @@ def create_refresh_token(uid:int) ->str:
 def create_jwt(uid:int, expire:timedelta, **kwargs) -> str:
     to_encode = kwargs.copy()
     exp = datetime.now(timezone.utc) + expire
-    to_encode.update({"sub":uid,"exp":exp})
+    to_encode.update({"sub":str(uid),"exp":exp})
     encoded_token = jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )
@@ -30,5 +30,5 @@ def create_jwt(uid:int, expire:timedelta, **kwargs) -> str:
 # 
 def validate_jwt(token:str)->int:
     payload=jwt.decode(token, settings.SECRET_KEY,algorithms=[settings.ALGORITHM])
-    return payload.get("sub")
+    return int(payload.get("sub"))
 
