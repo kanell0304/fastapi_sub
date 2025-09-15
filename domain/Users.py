@@ -9,8 +9,7 @@ from typing import Optional, Annotated
 from datetime import datetime
 #전화번호,이름, 4자리, 인증 암호화부분
 #SQLalchemy
-#전화번호,이름, 4자리, 인증 암호화부분
-#SQLalchemy
+
 class User(Base):
     __tablename__="users"
     user_id = Column(Integer, primary_key=True)
@@ -23,7 +22,6 @@ class User(Base):
     
 # Base.metadata.create_all(bind=engine)
 
-
 #pydantic Create 
 class UserCreate(BaseModel):    
     name:str = Field(...,min_length=2)    
@@ -32,7 +30,6 @@ class UserCreate(BaseModel):
     address:str = Field(...)
     is_staff:bool | None = False  
     
-
 #pydantic Update
 class UserUpdate(BaseModel):
     name:Optional[str] = None
@@ -46,13 +43,10 @@ class StaffLogin(BaseModel):
     phone:str|None = None
     password:str|None = None    
     
-
-
 #pydantic Read 
 class UserRead(BaseModel):
     user_id: int
-    name: str
-    
+    name: str    
 
     #ORM -> pydantic mapping 
     class Config:
